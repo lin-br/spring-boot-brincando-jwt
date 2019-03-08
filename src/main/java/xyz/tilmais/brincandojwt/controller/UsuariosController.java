@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import xyz.tilmais.brincandojwt.models.UsuarioModel;
+import xyz.tilmais.brincandojwt.services.UriResponsePost;
 import xyz.tilmais.brincandojwt.services.UsuarioService;
 
 import javax.validation.Valid;
@@ -24,10 +25,12 @@ public class UsuariosController {
     private Logger logger = LogManager.getLogger(this.getClass());
 
     private UsuarioService usuarioService;
+    private UriResponsePost uriResponsePost;
 
     @Autowired
-    public UsuariosController(UsuarioService usuarioService) {
+    public UsuariosController(UsuarioService usuarioService, UriResponsePost uriResponsePost) {
         this.usuarioService = usuarioService;
+        this.uriResponsePost = uriResponsePost;
     }
 
     @PostMapping(consumes = {
@@ -43,11 +46,9 @@ public class UsuariosController {
 
         Long identificador = usuarioService.cadastrarUsuario(request);
 
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{identificador}")
-                .buildAndExpand(identificador)
-                .toUri();
+        URI uri = this.uriResponsePost.obterUri(identificador);
+
+        logger.info("URI de response: " + uri);
 
         return ResponseEntity.created(uri).build();
     }
