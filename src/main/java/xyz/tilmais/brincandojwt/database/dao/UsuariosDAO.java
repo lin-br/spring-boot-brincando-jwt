@@ -34,10 +34,11 @@ public class UsuariosDAO {
                     if (resultSet.next()) {
                         id = resultSet.getLong("GENERATED_KEY");
                     }
-                    return id;
                 }
             }
         }
+
+        return id;
     }
 
     public Usuario obterUsuarioParaLogin(String nome) throws SQLException {
