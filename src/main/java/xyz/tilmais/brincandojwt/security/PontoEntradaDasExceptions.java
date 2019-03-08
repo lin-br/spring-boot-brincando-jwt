@@ -21,8 +21,6 @@ public class PontoEntradaDasExceptions implements AuthenticationEntryPoint {
                          AuthenticationException authException)
             throws IOException, ServletException {
 
-        System.out.println(authException.getMessage());
-
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
