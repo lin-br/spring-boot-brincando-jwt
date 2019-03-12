@@ -1,4 +1,4 @@
-package xyz.tilmais.cacheador;
+package xyz.tilmais.brincandojwt;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
