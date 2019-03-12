@@ -28,11 +28,7 @@ public class FiltroLogin extends AbstractAuthenticationProcessingFilter {
         LoginModel loginModel = new ObjectMapper().readValue(request.getInputStream(), LoginModel.class);
 
         return getAuthenticationManager()
-                .authenticate(new UsernamePasswordAuthenticationToken(
-                                loginModel.getNome(),
-                        loginModel.getSenha()
-                        )
-                );
+                .authenticate(new UsernamePasswordAuthenticationToken(loginModel.getNome(), loginModel.getSenha()));
     }
 
     @Override
