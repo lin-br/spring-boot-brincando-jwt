@@ -3,6 +3,7 @@ package xyz.tilmais.brincandojwt.services;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import xyz.tilmais.brincandojwt.database.entity.Item;
 import xyz.tilmais.brincandojwt.database.repository.ItemRepository;
@@ -22,6 +23,7 @@ public class ItemService {
         this.itemRepository = itemRepository;
     }
 
+    @PreAuthorize("hasAuthority('ESTOQUE')")
     public Integer cadastrarItem(ItemModel itemModel) throws SQLException {
 
         logger.info("Item para ser salvo: " + itemModel);
@@ -32,6 +34,7 @@ public class ItemService {
         return id;
     }
 
+    @PreAuthorize("hasAuthority('ESTOQUE')")
     public List<Item> obterTodos() throws SQLException {
         return this.itemRepository.obterTodos();
     }

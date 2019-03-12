@@ -3,6 +3,7 @@ package xyz.tilmais.brincandojwt.services;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import xyz.tilmais.brincandojwt.database.repository.PostRepository;
 import xyz.tilmais.brincandojwt.models.PostModel;
@@ -20,6 +21,7 @@ public class PostService {
         this.postRepository = postRepository;
     }
 
+    @PreAuthorize("hasAuthority('DESIGN')")
     public Integer cadastrarPost(PostModel postModel) throws SQLException {
 
         logger.info("Post para ser salvo: " + postModel);
