@@ -15,13 +15,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class ConfiguracaoSeguranca extends WebSecurityConfigurerAdapter {
 
     private ProvedorAutenticacaoPersonalizado provedorAutenticacaoPersonalizado;
-    private PontoEntradaDasExceptions pontoEntradaDasExceptions;
 
     @Autowired
-    public ConfiguracaoSeguranca(ProvedorAutenticacaoPersonalizado provedorAutenticacaoPersonalizado,
-                                 PontoEntradaDasExceptions pontoEntradaDasExceptions) {
+    public ConfiguracaoSeguranca(ProvedorAutenticacaoPersonalizado provedorAutenticacaoPersonalizado) {
         this.provedorAutenticacaoPersonalizado = provedorAutenticacaoPersonalizado;
-        this.pontoEntradaDasExceptions = pontoEntradaDasExceptions;
+    }
+
+    private FiltroAutenticacao obterFiltroAutenticacao() {
+        return new FiltroAutenticacao();
+    }
+
+    private FiltroLogin obterFiltroLogin() throws Exception {
+        return new FiltroLogin("/login/", authenticationManager());
+    }
+
+    private FiltroDeExceptions obterFiltroDeExceptions() {
+        return new FiltroDeExceptions();
     }
 
     @Override
@@ -44,29 +53,26 @@ public class ConfiguracaoSeguranca extends WebSecurityConfigurerAdapter {
                 .authenticated();
 
         /*
-         * Recupera o manipulador de exception padrão para adicionar um ponto de entrada.
-         * O Spring Security para aplicações REST ao invés de redirecionar as requisições
-         * de usuários que não estão logados para uma página de login, ele retorna um
-         * status HTTP como resposta. O Spring realiza essa ação através dos EntryPoints
-         * e por isso, nós alteramos o ponto de entrada (EntryPoint) para um customizado.
-         * */
-        httpSecurity.exceptionHandling().authenticationEntryPoint(this.pontoEntradaDasExceptions);
-
-        /*
          * Adiciona um primeiro filtro para autenticação,
-         * o filtro de login (FiltroLogin) e determina que antes do filtro
-         * de login, será utilizado um filtro UsernamePasswordAuthenticationFilter
+         * o filtro de Exceptions realiza a validação e tratamento das Exceptions que ocorrem nos
+         * outros filtros, é por meio deste filtro que conseguimos determinar respostas corretas para
+         * os clientes que realizam requisições para a API.
          * */
-        httpSecurity.addFilterBefore(new FiltroLogin("/login/", authenticationManager()),
-                UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(obterFiltroDeExceptions(), UsernamePasswordAuthenticationFilter.class);
 
         /*
          * Adiciona um segundo filtro para autenticação,
+         * o filtro de login (FiltroLogin) e determina que antes do filtro
+         * de login, será utilizado um filtro UsernamePasswordAuthenticationFilter
+         * */
+        httpSecurity.addFilterBefore(obterFiltroLogin(), UsernamePasswordAuthenticationFilter.class);
+
+        /*
+         * Adiciona um terceiro filtro para autenticação,
          * o filtro da autenticação do token (FiltroAutenticacao) e
          * determina que antes do filtro de login, será utilizado um filtro UsernamePasswordAuthenticationFilter
          * */
-        httpSecurity.addFilterBefore(new FiltroAutenticacao(),
-                UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterBefore(obterFiltroAutenticacao(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
